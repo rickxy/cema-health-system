@@ -27,8 +27,11 @@ urlpatterns = [
     # auth urls
     path("", include("auth.urls")),
 
+    # Client urls
+    path("client/", include("apps.clients.urls")),
+
     # APIs
-    path("api/v1/", include("api.urls")),
+    path("api/v1/", include("api.v1.urls")),
 
 
 ]
