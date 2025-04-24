@@ -1,16 +1,18 @@
 # CEMA HEALTH SYSTEM
 
-A Django-based backend application with modern development practices and Docker support.
+A Django-based backend system for managing clients and health programs/services. Built with modern best practices, containerized for scalability, and designed with clean architecture in mind.
 
 ## 🚀 Features
 
-- Django 4.2.5 backend
-- Docker containerization
-- Gunicorn production server
-- Nginx configuration
-- Environment-based configuration
-- Code formatting with Prettier
-- Editor configuration support
+- ✅ Django 4.2.5 backend with RESTful API
+- 🐳 Dockerized setup for production-ready deployments
+- 🔐 JWT-based authentication system
+- 🧬 Modular structure with reusable app components
+- 📦 Environment-specific configurations (Dev & Prod)
+- 🖥️ Gunicorn + Nginx for production serving
+- 🧹 Code formatting and editor configurations
+- 🔄 DRY and scalable folder structure
+- 🌍 Internationalization support
 
 ## 📋 Prerequisites
 
@@ -23,8 +25,9 @@ A Django-based backend application with modern development practices and Docker 
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
-cd backend
+git clone https://github.com/rickxy/cema-health-system.git
+cd cema-health-system
+
 ```
 
 2. Create and activate a virtual environment:
@@ -64,26 +67,72 @@ docker-compose up --build
 ## 🏗️ Project Structure
 
 ```
-backend/
-├── api/            # API endpoints
-├── apps/           # Django applications
-├── auth/           # Authentication related code
-├── config/         # Configuration files
-├── locale/         # Internationalization files
-├── nginx/          # Nginx configuration
-├── src/            # Source files
-├── templates/      # HTML templates
-├── web_project/    # Main Django project settings
-├── .env            # Environment variables
-├── .env.prod       # Production environment variables
-├── docker-compose.yml
-├── Dockerfile
-└── requirements.txt
+cema-health-system/
+├── api/                     # DRF API views, serializers, routing
+│   ├── v1/                  # Versioned API (optional, scalable)
+│   │   ├── __init__.py
+│   │   ├── urls.py          # API v1 routes
+│   │   ├── views/           # DRF views for clients & programs
+│   │   └── serializers/     # DRF serializers
+│
+├── apps/                    # Django apps
+│   ├── clients/             # Client model, logic, admin
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py
+│   │   ├── views.py
+│   │   ├── services.py      # (optional) business logic layer
+│   │   └── tests.py
+│   │
+│   └── programs/            # Health programs (e.g., TB, HIV)
+│       ├── admin.py
+│       ├── apps.py
+│       ├── models.py
+│       ├── views.py
+│       └── tests.py
+│
+├── auth/                    # Auth logic (JWT, social login, etc.)
+│   ├── views.py
+│   ├── serializers.py
+│   └── permissions.py
+│
+├── config/                  # Settings loader, environment split
+│   ├── __init__.py
+│   ├── base.py              # Base settings
+│   ├── dev.py               # Development settings
+│   └── prod.py              # Production settings
+│
+├── locale/                  # Internationalization files (.po/.mo)
+│   └── en/LC_MESSAGES/django.po
+│
+├── nginx/                   # Nginx configuration files
+│   └── default.conf
+│
+├── src/                     # Optional for reusable logic, services
+│   └── utils/               # Custom utilities/helpers
+│       └── validators.py
+│
+├── templates/               # HTML templates (optional, if using Django views)
+│   └── base.html
+│
+├── web_project/             # Django project root (settings, URLs)
+│   ├── __init__.py
+│   ├── settings.py          # Usually imports from config/
+│   ├── urls.py
+│   └── wsgi.py / asgi.py
+│
+├── .env                     # Local environment variables
+├── .env.prod                # Production environment variables
+├── docker-compose.yml       # Multi-container Docker orchestration
+├── Dockerfile               # App Dockerfile
+├── requirements.txt         # Python dependencies
+└── README.md                # Project overview, setup, endpoints
+
 ```
 
 ## 🔧 Configuration
 
-The project uses environment variables for configuration. Key files:
+Use the .env file for local configuration, and .env.prod for production settings. Key variables include:
 
 - `.env` - Development environment variables
 - `.env.prod` - Production environment variables
@@ -91,6 +140,8 @@ The project uses environment variables for configuration. Key files:
 ## 🛡️ Security
 
 - Environment variables for sensitive data
+- Django security best practices enforced (e.g., SECURE_SSL_REDIRECT, CSRF_COOKIE_SECURE)
+- Data access via authenticated APIs (JWT)
 - Django security settings
 - Production-ready configurations
 
@@ -111,3 +162,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - Django community
 - Open source contributors
+- CEMA mentorship program
