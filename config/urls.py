@@ -27,8 +27,20 @@ urlpatterns = [
     # auth urls
     path("", include("auth.urls")),
 
+    # Client urls
+    path("client/", include("apps.clients.urls")),
+
+    # Programs urls
+    path("program/", include("apps.programs.urls")),
+
+    # Visits urls
+    path("visit/", include("apps.visits.urls")),
+
+    # Logs urls
+    path("logs/", include("apps.logs.urls")),
+    
     # APIs
-    path("api/v1/", include("api.urls")),
+    path("api/v1/", include("api.v1.urls")),
 
 
 ]
