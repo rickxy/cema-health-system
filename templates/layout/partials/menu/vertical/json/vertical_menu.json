@@ -10,12 +10,37 @@
       "menu_header": "Sections"
     },
     {
+      "url": "program-index",
+      "icon": "menu-icon tf-icons ti ti-circle-letter-p",
+      "name": "Programs",
+      "slug": "program-index"
+    },
+    {
+      "url": "client-index",
+      "icon": "menu-icon tf-icons ti ti-circle-letter-c",
+      "name": "Clients",
+      "slug": "client-index"
+    },
+    {
+      "url": "visit-index",
+      "icon": "menu-icon tf-icons ti ti-circle-letter-v",
+      "name": "Visits",
+      "slug": "visit-index"
+    },
+    {
       "menu_header": "System"
     },
-
     {
-      "menu_header": "Misc"
+      "url": "user-index",
+      "icon": "menu-icon tf-icons ti ti-user-circle",
+      "name": "Users",
+      "slug": "user-index"
+    },
+    {
+      "url": "log-index",
+      "icon": "menu-icon tf-icons ti ti-timeline",
+      "name": "Activity Logs",
+      "slug": "log-index"
     }
-
   ]
 }

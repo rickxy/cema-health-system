@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "apps.dashboard",
     "apps.clients",
     "apps.visits",
+    "apps.users",
     "apps.programs",
     "apps.logs",
     "api",
