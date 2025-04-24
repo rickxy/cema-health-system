@@ -13,6 +13,11 @@ urlpatterns = [
         LoginView.as_view(template_name="auth/login.html"),
         name="login",
     ),
+       path(
+        "login/",
+        LoginView.as_view(template_name="auth/login.html"),
+        name="login",
+    ),
 
     path(
         "logout/",
