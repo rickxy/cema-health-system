@@ -4,6 +4,13 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class User(AbstractUser):
+    ROLE_CHOICES = [
+        ('admin', 'Admin'),
+        ('doctor', 'Doctor'),
+        ('nurse', 'Nurse'),
+        ('clerk', 'Clerk')
+    ]
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='clerk')
     name = models.CharField(max_length=150, blank=True)
     groups = models.ManyToManyField(
         Group,
