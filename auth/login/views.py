@@ -2,6 +2,7 @@ from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib import messages
+from apps.helpers.audit_log import log_activity
 from auth.views import AuthView
 
 
@@ -39,6 +40,13 @@ class LoginView(AuthView):
             if authenticated_user is not None:
                 # Login the user if authentication is successful
                 login(request, authenticated_user)
+
+                # Log the login activity
+                log_activity(
+                    action="User logged in",
+                    user=authenticated_user,
+                    metadata={"ip": request.META.get("REMOTE_ADDR")}
+                )
 
                 # Redirect to the page the user was trying to access before logging in
                 if "next" in request.GET:

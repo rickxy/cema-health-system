@@ -84,12 +84,37 @@ cema-health-system/
 │   │   ├── services.py      # (optional) business logic layer
 │   │   └── tests.py
 │   │
-│   └── programs/            # Health programs (e.g., TB, HIV)
-│       ├── admin.py
-│       ├── apps.py
-│       ├── models.py
-│       ├── views.py
-│       └── tests.py
+│   ├── programs/            # Health programs (e.g., TB, HIV)
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py
+│   │   ├── views.py
+│   │   └── tests.py
+│   │
+│   ├── dashboard/           # Custom analytics, dashboards
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── views.py
+│   │   ├── models.py
+│   │   └── tests.py
+│   │
+│   ├── visits/              # Patient visit records
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py
+│   │   ├── views.py
+│   │   └── tests.py
+│   │
+│   ├── logs/                # System audit logs
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py
+│   │   ├── views.py
+│   │   └── tests.py
+│   │
+│   └── helpers/             # Shared reusable logic
+│       ├── __init__.py
+│       └── audit_log.py     # Helper to log actions to AuditLog
 │
 ├── auth/                    # Auth logic (JWT, social login, etc.)
 │   ├── views.py
