@@ -43,6 +43,7 @@ class LoginView(AuthView):
 
                 # Log the login activity
                 log_activity(
+                    section="Authentication",
                     action="User logged in",
                     user=authenticated_user,
                     metadata={"ip": request.META.get("REMOTE_ADDR")}

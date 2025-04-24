@@ -369,7 +369,7 @@ class AuditLogView(View):
                 "action": log.action,
                 "description": metadata.get("description", ""),
                 "timestamp": localtime(log.timestamp).isoformat(),
-                "section": metadata.get("section", "")
+                "section": log.section,
             })
 
         return JsonResponse({
