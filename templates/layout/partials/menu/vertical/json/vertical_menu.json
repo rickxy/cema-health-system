@@ -1,0 +1,100 @@
+{
+  "menu": [
+    {
+      "url": "index",
+      "icon": "menu-icon tf-icons ti ti-smart-home",
+      "name": "Dashboard",
+      "slug": "index"
+    },
+    {
+      "menu_header": "Sections"
+    },
+    {
+      "url": "country-list",
+      "icon": "menu-icon tf-icons ti ti-map",
+      "name": "Countries",
+      "slug": "country-list"
+    },
+    {
+      "url": "indicator-list",
+      "icon": "menu-icon tf-icons ti ti-map",
+      "name": "Indicators",
+      "slug": "indicator-list"
+    },
+    {
+      "url": "distribution-data-list",
+      "icon": "menu-icon tf-icons ti ti-map",
+      "name": "Data",
+      "slug": "distribution-data-list"
+    },
+    {
+      "url": "country-scores",
+      "icon": "menu-icon tf-icons ti ti-map",
+      "name": "Country Index",
+      "slug": "country-scores"
+    },
+    {
+      "menu_header": "Config"
+    },
+    {
+      "url": "resources",
+      "icon": "menu-icon tf-icons ti ti-lifebuoy",
+      "name": "Resources",
+      "slug": "resources"
+    },
+    {
+      "url": "components",
+      "icon": "menu-icon tf-icons ti ti-components",
+      "name": "Components",
+      "slug": "components"
+    },
+    {
+      "url": "partners",
+      "icon": "menu-icon tf-icons ti ti-table",
+      "name": "Partners",
+      "slug": "partners"
+    },
+    {
+      "menu_header": "System"
+    },
+    {
+      "url": "users",
+      "name": "Users",
+      "permission": "transactions.view_transaction",
+      "icon": "menu-icon tf-icons ti ti-users",
+      "slug": "users"
+    },
+    {
+      "name": "Roles & Permissions",
+      "icon": "menu-icon tf-icons ti ti-settings",
+      "slug": "front-pages",
+      "submenu": [
+        {
+          "url": "roles",
+          "name": "Roles",
+          "slug": "roles"
+        },
+        {
+          "url": "permissions",
+          "name": "Permissions",
+          "slug": "permissions"
+        }
+      ]
+    },
+    {
+      "menu_header": "Misc"
+    },
+    {
+      "url": "support",
+      "icon": "menu-icon tf-icons ti ti-lifebuoy",
+      "name": "Support",
+      "slug": "support"
+    },
+    {
+      "url": "activity-logs",
+      "icon": "menu-icon tf-icons ti ti-brand-tabler",
+      "name": "Activity Logs",
+      "slug": "activity-logs"
+    }
+  ]
+}

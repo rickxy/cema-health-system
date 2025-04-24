@@ -1,0 +1,61 @@
+/* Custom Toastr Styles */
+#toast-container > div {
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  padding: 15px 15px 15px 50px;
+  width: 300px;
+  position: relative;
+}
+
+#toast-container > div:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  opacity: 1;
+  cursor: pointer;
+}
+
+#toast-container > .toast-success {
+  background-color: #28a745;
+  color: #fff;
+}
+
+#toast-container > .toast-error {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+#toast-container > .toast-info {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+#toast-container > .toast-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.toast-close-button {
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.toast-close-button:hover {
+  opacity: 1;
+}
+
+.toast-message {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.toast-progress {
+  opacity: 0.7;
+}
+
+.toast-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
