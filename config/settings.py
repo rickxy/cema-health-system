@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "apps.clients",
     "apps.visits",
     "apps.programs",
+    "apps.logs",
     "api",
     "auth.apps.AuthConfig",
     'corsheaders',

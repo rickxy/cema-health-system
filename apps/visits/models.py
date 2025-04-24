@@ -1,8 +1,7 @@
-from datetime import timezone
+from django.utils import timezone
 from django.db import models
-from clients.models import Client
-from programs.models import Program
-
+from apps.clients.models import Client
+from apps.programs.models import Program
 class Visit(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     program = models.ForeignKey(Program, on_delete=models.SET_NULL, null=True, blank=True)

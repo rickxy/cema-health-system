@@ -35,6 +35,9 @@ urlpatterns = [
 
     # Visits urls
     path("visit/", include("apps.visits.urls")),
+
+    # Logs urls
+    path("logs/", include("apps.logs.urls")),
     
     # APIs
     path("api/v1/", include("api.v1.urls")),
