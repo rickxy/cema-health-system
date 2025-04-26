@@ -17,6 +17,9 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.utils.timezone import localtime
 from apps.helpers.audit_log import log_activity
+from apps.clients.models import Client
+from django.db import IntegrityError
+from datetime import datetime
 
 
 logger = logging.getLogger(__name__)
@@ -542,3 +545,230 @@ class ProgramStatusUpdateView(View):
                 'status': 'error',
                 'message': str(e)
             }, status=400)
+
+@method_decorator(login_required, name='dispatch')
+class ClientListView(View):
+    def get(self, request):
+        clients = Client.objects.all().order_by('-registered_on')
+        client_data = []
+
+        for client in clients:
+            client_data.append({
+                'id': client.id,
+                'first_name': client.first_name,
+                'last_name': client.last_name,
+                'national_id': client.national_id,
+                'phone_number': client.phone_number,
+                'gender': client.get_gender_display(),
+                'date_of_birth': client.date_of_birth.strftime('%Y-%m-%d'),
+                'address': client.address,
+                'registered_on': client.registered_on.strftime('%Y-%m-%d %H:%M:%S')
+            })
+
+        return JsonResponse({'data': client_data})
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class ClientCreateView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            from django.db import IntegrityError
+
+            # Validate required fields
+            required_fields = ['first_name', 'last_name', 'national_id', 'gender', 'date_of_birth']
+            missing_fields = [field for field in required_fields if not data.get(field)]
+            if missing_fields:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': f'Missing required fields: {", ".join(missing_fields)}'
+                }, status=400)
+
+            # Convert date string to datetime object
+            try:
+                date_of_birth = datetime.strptime(data.get('date_of_birth'), '%Y-%m-%d').date()
+            except ValueError:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Invalid date format. Please use YYYY-MM-DD format.'
+                }, status=400)
+
+            try:
+                client = Client.objects.create(
+                    first_name=data.get('first_name'),
+                    last_name=data.get('last_name'),
+                    national_id=data.get('national_id'),
+                    phone_number=data.get('phone_number'),
+                    gender=data.get('gender'),
+                    date_of_birth=date_of_birth,
+                    address=data.get('address')
+                )
+
+                log_activity(section='Clients', action='Create', user=request.user, metadata={'client_id': client.id})
+
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Client created successfully',
+                    'client': {
+                        'id': client.id,
+                        'first_name': client.first_name,
+                        'last_name': client.last_name,
+                        'national_id': client.national_id,
+                        'phone_number': client.phone_number,
+                        'gender': client.get_gender_display(),
+                        'date_of_birth': client.date_of_birth.strftime('%Y-%m-%d'),
+                        'address': client.address,
+                        'registered_on': client.registered_on.strftime('%Y-%m-%d %H:%M:%S')
+                    }
+                })
+            except IntegrityError as e:
+                if 'national_id' in str(e):
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'A client with this National ID already exists.'
+                    }, status=400)
+                raise e
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class ClientEditView(View):
+    def get(self, request, client_id):
+        try:
+            client = Client.objects.get(id=client_id)
+            return JsonResponse({
+                'status': 'success',
+                'data': {
+                    'id': client.id,
+                    'first_name': client.first_name,
+                    'last_name': client.last_name,
+                    'national_id': client.national_id,
+                    'phone_number': client.phone_number,
+                    'gender': client.gender,
+                    'date_of_birth': client.date_of_birth.strftime('%Y-%m-%d'),
+                    'address': client.address
+                }
+            })
+        except Client.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Client not found'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+
+    def post(self, request, client_id):
+        try:
+            client = Client.objects.get(id=client_id)
+            data = json.loads(request.body)
+
+            # Store old data for logging
+            old_data = {
+                'first_name': client.first_name,
+                'last_name': client.last_name,
+                'national_id': client.national_id,
+                'phone_number': client.phone_number,
+                'gender': client.gender,
+                'date_of_birth': client.date_of_birth,
+                'address': client.address
+            }
+
+            # Convert date string to datetime object if provided
+            if 'date_of_birth' in data:
+                try:
+                    date_of_birth = datetime.strptime(data.get('date_of_birth'), '%Y-%m-%d').date()
+                    data['date_of_birth'] = date_of_birth
+                except ValueError:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'Invalid date format. Please use YYYY-MM-DD format.'
+                    }, status=400)
+
+            # Update client fields
+            client.first_name = data.get('first_name', client.first_name)
+            client.last_name = data.get('last_name', client.last_name)
+            client.national_id = data.get('national_id', client.national_id)
+            client.phone_number = data.get('phone_number', client.phone_number)
+            client.gender = data.get('gender', client.gender)
+            if 'date_of_birth' in data:
+                client.date_of_birth = data['date_of_birth']
+            client.address = data.get('address', client.address)
+
+            client.save()
+
+            # Log the edit activity
+            log_activity(section='Clients', action='Edit', user=request.user, metadata={'client_id': client.id})
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Client updated successfully',
+                'client': {
+                    'id': client.id,
+                    'first_name': client.first_name,
+                    'last_name': client.last_name,
+                    'national_id': client.national_id,
+                    'phone_number': client.phone_number,
+                    'gender': client.get_gender_display(),
+                    'date_of_birth': client.date_of_birth.strftime('%Y-%m-%d'),
+                    'address': client.address,
+                    'registered_on': client.registered_on.strftime('%Y-%m-%d %H:%M:%S')
+                }
+            })
+        except Client.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Client not found'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class ClientDeleteView(View):
+    def post(self, request, client_id):
+        try:
+            client = Client.objects.get(id=client_id)
+
+            # Store client info for logging before deletion
+            client_name = f"{client.first_name} {client.last_name}"
+
+            try:
+                client.delete()
+                logger.info(f"Client {client_name} deleted successfully")
+
+                # Log the activity
+                log_activity(section='Clients', action='Delete', user=request.user, metadata={'client_id': client_id})
+
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Client deleted successfully'
+                })
+            except ProtectedError as e:
+                logger.error(f"Failed to delete client {client_name} due to foreign key constraints: {str(e)}")
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Cannot delete client because they have associated records. Please remove or reassign these records first.'
+                }, status=400)
+
+        except Client.DoesNotExist:
+            logger.error(f"Client with ID {client_id} not found")
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Client not found'
+            }, status=404)
+        except Exception as e:
+            logger.error(f"Error deleting client: {str(e)}")
+            return JsonResponse({
+                'status': 'error',
+                'message': 'An error occurred while deleting the client'
+            }, status=500)
