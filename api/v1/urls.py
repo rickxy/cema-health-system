@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import AuditLogView, UserListView, UserCreateView, UserDeleteView, UserEditView, UserStatusUpdateView, UserDetailView
+from .views import AuditLogView, UserListView, UserCreateView, UserDeleteView, UserEditView, UserStatusUpdateView, UserDetailView, ProgramListView, ProgramCreateView, ProgramEditView, ProgramDeleteView, ProgramStatusUpdateView
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
@@ -42,4 +42,11 @@ urlpatterns = [
         login_required(AuditLogView.as_view()),
         name="logs-list",
     ),
+
+    # Programs APIs
+    path("programs/", login_required(ProgramListView.as_view()), name="program-list"),
+    path("program/create/", login_required(ProgramCreateView.as_view()), name="program-create"),
+    path("program/<int:program_id>/edit/", login_required(ProgramEditView.as_view()), name="program-edit"),
+    path("program/<int:program_id>/delete/", login_required(ProgramDeleteView.as_view()), name="program-delete"),
+    path("program/<int:program_id>/toggle-status/", login_required(ProgramStatusUpdateView.as_view()), name="program-toggle-status"),
 ]

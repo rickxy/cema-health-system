@@ -16,6 +16,7 @@ from apps.visits.models import Visit
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.utils.timezone import localtime
+from apps.helpers.audit_log import log_activity
 
 
 logger = logging.getLogger(__name__)
@@ -78,6 +79,9 @@ class UserCreateView(View):
 
             user.save()
 
+            # Log the user creation activity
+            log_activity(section='Users', action='Create', user=request.user, metadata={'user_id': user.id})
+
             return JsonResponse({
                 'status': 'success',
                 'message': 'User created successfully',
@@ -116,14 +120,7 @@ class UserDeleteView(View):
                 logger.info(f"User {username} ({email}) deleted successfully")
 
                 # Log the activity
-                AuditLog.objects.create(
-                    user=request.user,
-                    section='Users',
-                    action='Delete',
-                    description=f'Deleted user {username} ({email})',
-                    status='success',
-                    ip_address=request.META.get('REMOTE_ADDR')
-                )
+                log_activity(section='Users', action='Delete', user=request.user, metadata={'user_id': user.id})
 
                 return JsonResponse({
                     'status': 'success',
@@ -211,14 +208,7 @@ class UserEditView(View):
             user.save()
 
             # Log the edit activity
-            AuditLog.objects.create(
-                user=request.user,
-                section='Users',
-                action='Edit',
-                description=f'User {user.username} was edited. Changes: {json.dumps({k: v for k, v in data.items() if k in old_data and old_data[k] != v})}',
-                status='success',
-                ip_address=request.META.get('REMOTE_ADDR')
-            )
+            log_activity(section='Users', action='Edit', user=request.user, metadata={'user_id': user.id})
 
             return JsonResponse({
                 'status': 'success',
@@ -260,14 +250,7 @@ class UserStatusUpdateView(View):
             user.save()
 
             # Log the status change
-            AuditLog.objects.create(
-                user=request.user,
-                section='Users',
-                action='Status Update',
-                description=f'User {user.username} status changed from {"Active" if old_status else "Inactive"} to {"Active" if user.is_active else "Inactive"}',
-                status='success',
-                ip_address=request.META.get('REMOTE_ADDR')
-            )
+            log_activity(section='Users', action='Status Update', user=request.user, metadata={'user_id': user.id})
 
             return JsonResponse({
                 'status': 'success',
@@ -310,15 +293,6 @@ class UserDetailView(DetailView):
 
         user = super().get_object(queryset)
 
-        # Log the view action
-        AuditLog.objects.create(
-            user=self.request.user,
-            section='Users',
-            action='View',
-            description=f'Viewed details of user {user.username}',
-            status='success',
-            ip_address=self.request.META.get('REMOTE_ADDR')
-        )
         return user
 
     def get(self, request, *args, **kwargs):
@@ -378,3 +352,193 @@ class AuditLogView(View):
             "recordsFiltered": records_filtered,
             "data": data
         })
+
+@method_decorator(login_required, name='dispatch')
+class ProgramListView(View):
+    def get(self, request):
+        from apps.programs.models import Program
+
+        programs = Program.objects.all().order_by('-id')
+        program_data = []
+
+        for program in programs:
+            program_data.append({
+                'id': program.id,
+                'name': program.name,
+                'description': program.description,
+                'is_active': program.is_active
+            })
+
+        return JsonResponse({'data': program_data})
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class ProgramCreateView(View):
+    def post(self, request):
+        try:
+            from apps.programs.models import Program
+            data = json.loads(request.body)
+            program = Program.objects.create(
+                name=data.get('name'),
+                description=data.get('description', ''),
+                is_active=data.get('is_active', True)
+            )
+            log_activity(section='Programs', action='Create', user=request.user, metadata={'program_id': program.id})
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Program created successfully',
+                'program': {
+                    'id': program.id,
+                    'name': program.name,
+                    'description': program.description,
+                    'is_active': program.is_active
+                }
+            })
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class ProgramEditView(View):
+    def get(self, request, program_id):
+        try:
+            from apps.programs.models import Program
+            program = Program.objects.get(id=program_id)
+            return JsonResponse({
+                'status': 'success',
+                'data': {
+                    'id': program.id,
+                    'name': program.name,
+                    'description': program.description,
+                    'is_active': program.is_active
+                }
+            })
+        except Program.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Program not found'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+
+    def post(self, request, program_id):
+        try:
+            from apps.programs.models import Program
+            program = Program.objects.get(id=program_id)
+            data = json.loads(request.body)
+
+            # Store old data for logging
+            old_data = {
+                'name': program.name,
+                'description': program.description,
+                'is_active': program.is_active
+            }
+
+            # Update program fields
+            program.name = data.get('name', program.name)
+            program.description = data.get('description', program.description)
+            program.is_active = data.get('is_active', program.is_active)
+            program.save()
+
+            # Log the edit activity
+            log_activity(section='Programs', action='Edit', user=request.user, metadata={'program_id': program.id})
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Program updated successfully',
+                'program': {
+                    'id': program.id,
+                    'name': program.name,
+                    'description': program.description,
+                    'is_active': program.is_active
+                }
+            })
+        except Program.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Program not found'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class ProgramDeleteView(View):
+    def post(self, request, program_id):
+        try:
+            from apps.programs.models import Program
+            program = Program.objects.get(id=program_id)
+
+            # Store program info for logging before deletion
+            program_name = program.name
+
+            try:
+                program.delete()
+                logger.info(f"Program {program_name} deleted successfully")
+
+                # Log the activity
+                log_activity(section='Programs', action='Delete', user=request.user, metadata={'program_id': program_id})
+
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Program deleted successfully'
+                })
+            except ProtectedError as e:
+                logger.error(f"Failed to delete program {program_name} due to foreign key constraints: {str(e)}")
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Cannot delete program because it has associated records. Please remove or reassign these records first.'
+                }, status=400)
+
+        except Program.DoesNotExist:
+            logger.error(f"Program with ID {program_id} not found")
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Program not found'
+            }, status=404)
+        except Exception as e:
+            logger.error(f"Error deleting program: {str(e)}")
+            return JsonResponse({
+                'status': 'error',
+                'message': 'An error occurred while deleting the program'
+            }, status=500)
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class ProgramStatusUpdateView(View):
+    def post(self, request, program_id):
+        try:
+            from apps.programs.models import Program
+            program = Program.objects.get(id=program_id)
+
+            # Toggle the status
+            program.is_active = not program.is_active
+            program.save()
+
+            # Log the status change
+            log_activity(section='Programs', action='Status Update', user=request.user, metadata={'program_id': program.id})
+
+            return JsonResponse({
+                'status': 'success',
+                'message': f'Program {"activated" if program.is_active else "deactivated"} successfully',
+                'is_active': program.is_active
+            })
+        except Program.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Program not found'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
