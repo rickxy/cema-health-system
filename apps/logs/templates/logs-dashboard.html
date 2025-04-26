@@ -1,0 +1,61 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %} Audit Logs {% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/css/pages/app-health-dashboard.css' %}" />
+{% endblock page_css %}
+
+{% block page_js %}
+{{ block.super }}
+<script src="{% static 'js/logs-dashboard.js' %}"></script>
+{% endblock page_js %}
+
+{% block content %}
+
+<!-- Users List Table -->
+<div class="card">
+  <div class="card-header border-bottom">
+    <h5 class="card-title mb-3"> Audit Logs</h5>
+    <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
+      <div class="col-md-4 user_role"></div>
+      <div class="col-md-4 user_status"></div>
+    </div>
+  </div>
+  <div class="card-datatable table-responsive">
+    <table class="datatables-users table">
+      <thead class="border-top">
+        <tr>
+          <th></th>
+          <th>User</th>
+          <th>Action</th>
+          <th>Section</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

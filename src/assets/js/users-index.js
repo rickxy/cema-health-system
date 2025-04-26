@@ -41,7 +41,7 @@ $(function () {
   if (dt_user_table.length) {
     dt_user = dt_user_table.DataTable({
       ajax: {
-        url: '/users/api/users/',
+        url: '/api/v1/users/',
         type: 'GET',
         dataSrc: 'data' // Specify the data source property
       },
@@ -480,7 +480,7 @@ $(function () {
       if (result.isConfirmed) {
         // Send delete request
         $.ajax({
-          url: `/users/api/users/${userId}/delete/`,
+          url: `/api/v1/user/${userId}/delete/`,
           type: 'POST',
           headers: {
             'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
@@ -533,7 +533,7 @@ $(function () {
 
     // Fetch user details
     $.ajax({
-      url: `/users/api/users/${userId}/edit/`,
+      url: `/api/v1/user/${userId}/edit/`,
       type: 'GET',
       success: function (response) {
         if (response.status === 'success') {
@@ -572,7 +572,7 @@ $(function () {
 
     // Send update request
     $.ajax({
-      url: `/users/api/users/${userId}/edit/`,
+      url: `/api/v1/user/${userId}/edit/`,
       type: 'POST',
       contentType: 'application/json',
       headers: {
@@ -668,7 +668,7 @@ $(function () {
     console.log('CSRF Token:', csrftoken);
 
     $.ajax({
-      url: '/users/api/users/create/',
+      url: '/api/v1/user/create/',
       type: 'POST',
       contentType: 'application/json',
       headers: {
@@ -914,7 +914,7 @@ $(function () {
       if (result.isConfirmed) {
         // Send status update request
         $.ajax({
-          url: `/users/api/users/${userId}/status/`,
+          url: `/api/v1/user/${userId}/status/`,
           type: 'POST',
           headers: {
             'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()

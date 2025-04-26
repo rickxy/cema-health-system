@@ -1,0 +1,218 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %} Programs {% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<style>
+  .swal2-container-custom {
+    z-index: 1060 !important;
+    margin-top: 4.5rem !important;
+    right: 1rem !important;
+  }
+  .swal2-toast {
+    width: 350px !important;
+    margin-right: 0 !important;
+  }
+</style>
+{% endblock page_css %}
+
+{% block page_js %}
+{{ block.super }}
+<script src="{% static 'js/programs-dashboard.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock page_js %}
+
+{% block content %}
+
+<!-- programs List Table -->
+<div class="card">
+  <div class="card-header border-bottom">
+    <h5 class="card-title mb-3"> Programs</h5>
+    <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
+      <div class="col-md-4 user_role"></div>
+      <div class="col-md-4 user_status"></div>
+    </div>
+  </div>
+  <div class="card-datatable table-responsive">
+    <table class="datatables-programs table">
+      <thead class="border-top">
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th style="display: none;">Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data will be loaded dynamically -->
+      </tbody>
+    </table>
+  </div>
+  <!-- Offcanvas to add new user -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddProgram" aria-labelledby="offcanvasAddProgramLabel">
+    <div class="offcanvas-header">
+      <h5 id="offcanvasAddProgramLabel" class="offcanvas-title">Add Program</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100">
+      <form class="add-new-user pt-0" id="addProgramForm" onsubmit="return false">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label" for="programName">Program Name</label>
+          <input type="text" class="form-control" id="programName" placeholder="Program Name" name="name" autocomplete="given-name" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="programDescription">Description</label>
+          <textarea class="form-control" id="programDescription" name="description" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="programStatus">Status</label>
+          <select class="form-select" id="programStatus" name="is_active" required>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary me-sm-3 me-1 data-submit" id="submit-program-form" name="submit-program-form">Submit</button>
+        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas" id="cancel-program-form" name="cancel-program-form">Cancel</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal to edit program -->
+<div class="modal fade" id="editProgramModal" tabindex="-1" aria-labelledby="editProgramModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProgramModalLabel">Edit Program</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editProgramForm">
+          {% csrf_token %}
+          <input type="hidden" id="editProgramId" name="id">
+          <div class="mb-3">
+            <label class="form-label" for="editProgramName">Program Name</label>
+            <input type="text" class="form-control" id="editProgramName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="editProgramDescription">Description</label>
+            <textarea class="form-control" id="editProgramDescription" name="description" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="editProgramStatus">Status</label>
+            <select class="form-select" id="editProgramStatus" name="is_active" required>
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View User Modal -->
+<div class="modal fade" id="viewUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewUserModalTitle">User Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <div class="d-flex align-items-center">
+              <div class="avatar me-3" id="viewUserAvatar">
+                <!-- Avatar will be inserted here -->
+              </div>
+              <div class="d-flex flex-column">
+                <h6 class="mb-1" id="viewUserName">Loading...</h6>
+                <span class="text-muted" id="viewUserEmail">Loading...</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="table-responsive">
+              <table class="table table-borderless">
+                <tbody>
+                  <tr>
+                    <td class="text-muted">Role:</td>
+                    <td id="viewUserRole">Loading...</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted">Status:</td>
+                    <td id="viewUserStatus">Loading...</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted">Last Login:</td>
+                    <td id="viewUserLastLogin">Loading...</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted">Date Joined:</td>
+                    <td id="viewUserDateJoined">Loading...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Logs Section -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h6 class="mb-3">Recent Activity</h6>
+            <div class="table-responsive">
+              <table class="table table-hover" id="viewUserActivityLogs">
+                <thead>
+                  <tr>
+                    <th>Action</th>
+                    <th>Section</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Activity logs will be inserted here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

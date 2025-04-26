@@ -1,0 +1,59 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}User Details{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header border-bottom">
+                    <h5 class="card-title mb-3">User Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Full Name</label>
+                                <p class="form-control-static">{{ user.get_full_name }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <p class="form-control-static">{{ user.email }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Role</label>
+                                <p class="form-control-static">{{ user.role }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <p class="form-control-static">
+                                    <span class="badge {% if user.is_active %}bg-label-success{% else %}bg-label-secondary{% endif %}">
+                                        {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Last Login</label>
+                                <p class="form-control-static">{{ user.last_login|default:"Never" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Date Joined</label>
+                                <p class="form-control-static">{{ user.date_joined }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'users' %}" class="btn btn-label-secondary">Back to Users</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

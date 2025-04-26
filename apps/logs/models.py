@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 class AuditLog(models.Model):
+    section = models.CharField(max_length=255, default='audit')
     action = models.CharField(max_length=255)
     performed_by = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
