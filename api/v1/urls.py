@@ -3,7 +3,9 @@ from .views import (
     AuditLogView, UserListView, UserCreateView, UserDeleteView, UserEditView,
     UserStatusUpdateView, UserDetailView, ProgramListView, ProgramCreateView,
     ProgramEditView, ProgramDeleteView, ProgramStatusUpdateView,
-    ClientListView, ClientCreateView, ClientEditView, ClientDeleteView
+    ClientListView, ClientCreateView, ClientEditView, ClientDeleteView,
+    EnrollmentListView, EnrollmentCreateView, EnrollmentUpdateView, EnrollmentDeleteView,
+    ClientEnrollmentsView
 )
 from django.contrib.auth.decorators import login_required
 
@@ -60,4 +62,11 @@ urlpatterns = [
     path("client/create/", login_required(ClientCreateView.as_view()), name="client-create"),
     path("client/<int:client_id>/edit/", login_required(ClientEditView.as_view()), name="client-edit"),
     path("client/<int:client_id>/delete/", login_required(ClientDeleteView.as_view()), name="client-delete"),
+
+    # Enrollments APIs
+    path("enrollments/", login_required(EnrollmentListView.as_view()), name="enrollment-list"),
+    path("enrollment/create/", login_required(EnrollmentCreateView.as_view()), name="enrollment-create"),
+    path("enrollment/<int:enrollment_id>/update/", login_required(EnrollmentUpdateView.as_view()), name="enrollment-update"),
+    path("enrollment/<int:enrollment_id>/delete/", login_required(EnrollmentDeleteView.as_view()), name="enrollment-delete"),
+    path("client/<int:client_id>/enrollments/", login_required(ClientEnrollmentsView.as_view()), name="client-enrollments"),
 ]

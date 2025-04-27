@@ -27,139 +27,247 @@
 <link rel="stylesheet" href="{% static 'vendor/css/pages/app-health-dashboard.css' %}" />
 {% endblock page_css %}
 
-{% block page_js %}
-{{ block.super }}
-<script src="{% static 'js/app-health-dashboard.js' %}"></script>
-{% endblock page_js %}
-
 {% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
 
-<!-- Welcome section -->
-<div class="card bg-transparent shadow-none my-4 border-0">
-  <div class="card-body row p-0 pb-3">
-    <div class="col-12 col-md-8 card-separator">
-      <h3>Welcome to CEMA Health System Dashboard 👋🏻</h3>
-      <div class="col-12 col-lg-7">
-        <p>Monitor healthcare performance indicators across facilities and regions.</p>
+  <!-- Welcome Header -->
+  <div class="card bg-transparent shadow-none my-4 border-0">
+    <div class="card-body row p-0 pb-3">
+      <div class="col-12 col-md-8 card-separator pe-0 pe-md-3">
+        <h3>Welcome to CEMA Health System Dashboard 👋🏻</h3>
+        <div class="col-12 col-lg-7">
+          <p>Monitor healthcare performance indicators across facilities and regions.</p>
+        </div>
+        <div class="d-flex justify-content-between flex-wrap gap-3 me-5">
+          <div class="d-flex align-items-center gap-3 me-4 me-sm-0">
+            <span class="bg-label-primary p-2 rounded">
+              <i class='ti ti-users ti-xl'></i>
+            </span>
+            <div class="content-right">
+              <p class="mb-0">Total Clients</p>
+              <h4 class="text-primary mb-0">{{ total_clients }}</h4>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <span class="bg-label-info p-2 rounded">
+              <i class='ti ti-clipboard-check ti-xl'></i>
+            </span>
+            <div class="content-right">
+              <p class="mb-0">Active Programs</p>
+              <h4 class="text-info mb-0">{{ active_programs }}</h4>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <span class="bg-label-success p-2 rounded">
+              <i class='ti ti-checkbox ti-xl'></i>
+            </span>
+            <div class="content-right">
+              <p class="mb-0">Active Enrollments</p>
+              <h4 class="text-success mb-0">{{ active_enrollments }}</h4>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="d-flex justify-content-between flex-wrap gap-3 me-5">
-        <div class="d-flex align-items-center gap-3 me-4 me-sm-0">
-          <span class="bg-label-primary p-2 rounded">
-            <i class='ti ti-user ti-xl'></i>
-          </span>
-          <div class="content-right">
-            <p class="mb-0"> Active Patients </p>
-            <h4 class="text-primary mb-0"> {{ active_patients_count }} </h4>
-          </div>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-          <span class="bg-label-info p-2 rounded">
-            <i class='ti ti-hospital ti-xl'></i>
-          </span>
-          <div class="content-right">
-            <p class="mb-0"> Facilities</p>
-            <h4 class="text-info mb-0"> 134 </h4>
-          </div>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-          <span class="bg-label-success p-2 rounded">
-            <i class='ti ti-world ti-xl'></i>
-          </span>
-          <div class="content-right">
-            <p class="mb-0"> Regions Covered</p>
-            <h4 class="text-success mb-0"> 24 </h4>
+      <div class="col-12 col-md-4 ps-md-3 ps-lg-4 pt-3 pt-md-0">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-2">Program Completion</h5>
+            <p class="mb-5">Overall rate this quarter</p>
+            <div class="time-spending-chart">
+              <h3 class="mb-2">{{ completed_enrollments }}<span class="text-muted">/{{ total_enrollments }}</span></h3>
+              <span class="badge bg-label-success">Completed</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-12 col-md-4 ps-md-3 ps-lg-4 pt-3 pt-md-0">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h5 class="mb-2">Treatment Completion</h5>
-          <p class="mb-5">Overall rate this quarter</p>
-          <div class="time-spending-chart">
-            <h3 class="mb-2">84<span class="text-muted">%</span></h3>
-            <span class="badge bg-label-success">+6.1%</span>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="row gy-4 mb-4">
+    <!-- New Clients Card -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card card-border-shadow-primary">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2 pb-1">
+            <div class="avatar me-2">
+              <span class="avatar-initial rounded bg-label-primary"><i class="ti ti-user-plus ti-md"></i></span>
+            </div>
+            <h4 class="ms-1 mb-0">{{ recent_clients_count }}</h4>
+          </div>
+          <p class="mb-1">New Clients (30 days)</p>
+          <p class="mb-0">
+            <span class="fw-medium me-1">+{{ recent_clients_count }}</span>
+            <small class="text-muted">from last month</small>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completion Rate Card -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card card-border-shadow-success">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2 pb-1">
+            <div class="avatar me-2">
+              <span class="avatar-initial rounded bg-label-success"><i class="ti ti-check ti-md"></i></span>
+            </div>
+            <h4 class="ms-1 mb-0">{{ completion_rate }}%</h4>
+          </div>
+          <p class="mb-1">Completion Rate</p>
+          <p class="mb-0">
+            <span class="fw-medium me-1">{{ completed_enrollments }}</span>
+            <small class="text-muted">completed programs</small>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dropout Rate Card -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card card-border-shadow-danger">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2 pb-1">
+            <div class="avatar me-2">
+              <span class="avatar-initial rounded bg-label-danger"><i class="ti ti-x ti-md"></i></span>
+            </div>
+            <h4 class="ms-1 mb-0">{{ dropout_rate }}%</h4>
+          </div>
+          <p class="mb-1">Dropout Rate</p>
+          <p class="mb-0">
+            <span class="fw-medium me-1">{{ dropped_enrollments }}</span>
+            <small class="text-muted">dropped enrollments</small>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Program Success Rate Card -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card card-border-shadow-info">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2 pb-1">
+            <div class="avatar me-2">
+              <span class="avatar-initial rounded bg-label-info"><i class="ti ti-trending-up ti-md"></i></span>
+            </div>
+            <h4 class="ms-1 mb-0">{{ success_rate }}%</h4>
+          </div>
+          <p class="mb-1">Program Success Rate</p>
+          <p class="mb-0">
+            <span class="fw-medium me-1">{{ completed_enrollments }}</span>
+            <small class="text-muted">successful completions</small>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Enrollments Table -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Recent Enrollments</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Program</th>
+                  <th>Enrolled On</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for enrollment in recent_enrollments %}
+                <tr>
+                  <td>{{ enrollment.client.first_name }} {{ enrollment.client.last_name }}</td>
+                  <td>{{ enrollment.program.name }}</td>
+                  <td>{{ enrollment.enrolled_on|date:"M d, Y" }}</td>
+                  <td>
+                    <span class="badge {% if enrollment.status == 'active' %}bg-label-success
+                      {% elif enrollment.status == 'completed' %}bg-label-info
+                      {% else %}bg-label-danger{% endif %}">
+                      {{ enrollment.status|title }}
+                    </span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
         </div>
-        <div id="leadsReportChart"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gender and Program Distribution -->
+  <div class="row gy-4 mb-4">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Gender Distribution</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Gender</th>
+                  <th>Count</th>
+                  <th>Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for gender in gender_distribution %}
+                <tr>
+                  <td>{{ gender.gender|title }}</td>
+                  <td>{{ gender.count }}</td>
+                  <td>{{ gender.percentage }}%</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Top Programs</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Program</th>
+                  <th>Enrollments</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for program in program_distribution %}
+                <tr>
+                  <td>{{ program.name }}</td>
+                  <td>{{ program.enrollment_count }}</td>
+                  <td>
+                    <span class="badge {% if program.is_active %}bg-label-success
+                      {% else %}bg-label-danger{% endif %}">
+                      {{ program.is_active|yesno:"Active,Inactive" }}
+                    </span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-<!-- End Welcome section -->
-
-<!-- Health Key Metrics Cards -->
-<div class="row">
-  <div class="col-sm-6 col-lg-3 mb-4">
-    <div class="card card-border-shadow-primary">
-      <div class="card-body">
-        <div class="d-flex align-items-center mb-2 pb-1">
-          <div class="avatar me-2">
-            <span class="avatar-initial rounded bg-label-primary"><i class="ti ti-heart-rate-monitor ti-md"></i></span>
-          </div>
-          <h4 class="ms-1 mb-0">87%</h4>
-        </div>
-        <p class="mb-1">Treatment Success Rate</p>
-        <p class="mb-0">
-          <span class="fw-medium me-1">+3.4%</span>
-          <small class="text-muted">from last quarter</small>
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-lg-3 mb-4">
-    <div class="card card-border-shadow-warning">
-      <div class="card-body">
-        <div class="d-flex align-items-center mb-2 pb-1">
-          <div class="avatar me-2">
-            <span class="avatar-initial rounded bg-label-warning"><i class='ti ti-ambulance ti-md'></i></span>
-          </div>
-          <h4 class="ms-1 mb-0">92%</h4>
-        </div>
-        <p class="mb-1">Emergency Response Rate</p>
-        <p class="mb-0">
-          <span class="fw-medium me-1">+1.2%</span>
-          <small class="text-muted">compared to last month</small>
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-lg-3 mb-4">
-    <div class="card card-border-shadow-success">
-      <div class="card-body">
-        <div class="d-flex align-items-center mb-2 pb-1">
-          <div class="avatar me-2">
-            <span class="avatar-initial rounded bg-label-success"><i class='ti ti-pulse ti-md'></i></span>
-          </div>
-          <h4 class="ms-1 mb-0">76%</h4>
-        </div>
-        <p class="mb-1">Preventive Coverage</p>
-        <p class="mb-0">
-          <span class="fw-medium me-1">+5.1%</span>
-          <small class="text-muted">YOY growth</small>
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-lg-3 mb-4">
-    <div class="card card-border-shadow-info">
-      <div class="card-body">
-        <div class="d-flex align-items-center mb-2 pb-1">
-          <div class="avatar me-2">
-            <span class="avatar-initial rounded bg-label-info"><i class='ti ti-report ti-md'></i></span>
-          </div>
-          <h4 class="ms-1 mb-0">88%</h4>
-        </div>
-        <p class="mb-1">Health Records Accuracy</p>
-        <p class="mb-0">
-          <span class="fw-medium me-1">+4.6%</span>
-          <small class="text-muted">since audit</small>
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-<!--/ Health Key Metrics Cards -->
-
 {% endblock %}

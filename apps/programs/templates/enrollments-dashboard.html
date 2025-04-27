@@ -1,0 +1,165 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %} Enrollments {% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+<script src="{% static 'vendor/libs/sweetalert2/sweetalert2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" />
+<style>
+  .swal2-container-custom {
+    z-index: 1060 !important;
+    margin-top: 4.5rem !important;
+    right: 1rem !important;
+  }
+  .swal2-toast {
+    width: 350px !important;
+    margin-right: 0 !important;
+  }
+</style>
+{% endblock page_css %}
+
+{% block page_js %}
+{{ block.super }}
+<script src="{% static 'js/enrollments-dashboard.js' %}"></script>
+{% endblock page_js %}
+
+{% block content %}
+
+<!-- Enrollments List Table -->
+<div class="card">
+  <div class="card-header border-bottom">
+    <h5 class="card-title mb-3">Enrollments</h5>
+    <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
+      <div class="col-md-4 program_filter"></div>
+      <div class="col-md-4 status_filter"></div>
+    </div>
+  </div>
+  <div class="card-datatable table-responsive">
+    <table class="datatables-enrollments table">
+      <thead class="border-top">
+        <tr>
+          <th>Client Name</th>
+          <th>Program</th>
+          <th>Enrolled On</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data will be loaded dynamically -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal to enroll client -->
+<div class="modal fade" id="enrollClientModal" tabindex="-1" aria-labelledby="enrollClientModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="enrollClientModalLabel">Enroll Client</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="enrollClientForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="enrollClient">Client</label>
+            <select id="enrollClient" class="select2 form-select" name="client_id" required>
+              <option value="">Select Client</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="enrollProgram">Program</label>
+            <select id="enrollProgram" class="select2 form-select" name="program_id" required>
+              <option value="">Select Program</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="enrollStatus">Status</label>
+            <select class="form-select" id="enrollStatus" name="status" required>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+              <option value="dropped">Dropped</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Enroll Client</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal to view client enrollments -->
+<div class="modal fade" id="viewClientEnrollmentsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewClientEnrollmentsModalTitle">Client Enrollments</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <div class="d-flex align-items-center">
+              <div class="d-flex flex-column">
+                <h6 class="mb-1" id="viewClientName">Loading...</h6>
+                <span class="text-muted" id="viewClientNationalId">Loading...</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="table-responsive">
+              <table class="table table-hover" id="viewClientEnrollments">
+                <thead>
+                  <tr>
+                    <th>Program</th>
+                    <th>Enrolled On</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Enrollments will be loaded here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

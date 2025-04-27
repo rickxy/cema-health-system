@@ -12,7 +12,6 @@ from apps.logs.models import AuditLog
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404
 import logging
-from apps.visits.models import Visit
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.utils.timezone import localtime
@@ -772,3 +771,215 @@ class ClientDeleteView(View):
                 'status': 'error',
                 'message': 'An error occurred while deleting the client'
             }, status=500)
+
+@method_decorator(login_required, name='dispatch')
+class EnrollmentListView(View):
+    def get(self, request):
+        from apps.programs.models import Enrollment
+        enrollments = Enrollment.objects.select_related('client', 'program').all().order_by('-enrolled_on')
+        enrollment_data = []
+
+        for enrollment in enrollments:
+            enrollment_data.append({
+                'id': enrollment.id,
+                'client_id': enrollment.client.id,
+                'client_name': f"{enrollment.client.first_name} {enrollment.client.last_name}",
+                'program_id': enrollment.program.id,
+                'program_name': enrollment.program.name,
+                'enrolled_on': enrollment.enrolled_on.strftime('%Y-%m-%d'),
+                'status': enrollment.status
+            })
+
+        return JsonResponse({'data': enrollment_data})
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class EnrollmentCreateView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            from apps.programs.models import Enrollment
+            from apps.clients.models import Client
+            from apps.programs.models import Program
+
+            # Validate required fields
+            required_fields = ['client_id', 'program_id']
+            missing_fields = [field for field in required_fields if not data.get(field)]
+            if missing_fields:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': f'Missing required fields: {", ".join(missing_fields)}'
+                }, status=400)
+
+            # Check if client exists
+            try:
+                client = Client.objects.get(id=data.get('client_id'))
+            except Client.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Client not found'
+                }, status=404)
+
+            # Check if program exists
+            try:
+                program = Program.objects.get(id=data.get('program_id'))
+            except Program.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Program not found'
+                }, status=404)
+
+            # Check if enrollment already exists
+            if Enrollment.objects.filter(client=client, program=program).exists():
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Client is already enrolled in this program'
+                }, status=400)
+
+            # Create enrollment
+            enrollment = Enrollment.objects.create(
+                client=client,
+                program=program,
+                status=data.get('status', 'active')
+            )
+
+            log_activity(section='Enrollments', action='Create', user=request.user, metadata={
+                'enrollment_id': enrollment.id,
+                'client_id': client.id,
+                'program_id': program.id
+            })
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Client enrolled successfully',
+                'enrollment': {
+                    'id': enrollment.id,
+                    'client_name': f"{client.first_name} {client.last_name}",
+                    'program_name': program.name,
+                    'enrolled_on': enrollment.enrolled_on.strftime('%Y-%m-%d'),
+                    'status': enrollment.status
+                }
+            })
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class EnrollmentUpdateView(View):
+    def post(self, request, enrollment_id):
+        try:
+            from apps.programs.models import Enrollment
+            enrollment = Enrollment.objects.get(id=enrollment_id)
+            data = json.loads(request.body)
+
+            # Update status if provided
+            if 'status' in data:
+                enrollment.status = data['status']
+                enrollment.save()
+
+                log_activity(section='Enrollments', action='Update', user=request.user, metadata={
+                    'enrollment_id': enrollment.id,
+                    'new_status': data['status']
+                })
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Enrollment updated successfully',
+                'enrollment': {
+                    'id': enrollment.id,
+                    'client_name': f"{enrollment.client.first_name} {enrollment.client.last_name}",
+                    'program_name': enrollment.program.name,
+                    'enrolled_on': enrollment.enrolled_on.strftime('%Y-%m-%d'),
+                    'status': enrollment.status
+                }
+            })
+        except Enrollment.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Enrollment not found'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class EnrollmentDeleteView(View):
+    def post(self, request, enrollment_id):
+        try:
+            from apps.programs.models import Enrollment
+            enrollment = Enrollment.objects.get(id=enrollment_id)
+
+            # Store enrollment info for logging before deletion
+            enrollment_info = {
+                'client_name': f"{enrollment.client.first_name} {enrollment.client.last_name}",
+                'program_name': enrollment.program.name
+            }
+
+            enrollment.delete()
+
+            log_activity(section='Enrollments', action='Delete', user=request.user, metadata={
+                'enrollment_id': enrollment_id,
+                'client_name': enrollment_info['client_name'],
+                'program_name': enrollment_info['program_name']
+            })
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Enrollment deleted successfully'
+            })
+        except Enrollment.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Enrollment not found'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+
+@method_decorator(login_required, name='dispatch')
+class ClientEnrollmentsView(View):
+    def get(self, request, client_id):
+        try:
+            from apps.programs.models import Enrollment
+            from apps.clients.models import Client
+
+            client = Client.objects.get(id=client_id)
+            enrollments = Enrollment.objects.filter(client=client).select_related('program')
+
+            enrollment_data = []
+            for enrollment in enrollments:
+                enrollment_data.append({
+                    'id': enrollment.id,
+                    'program_id': enrollment.program.id,
+                    'program_name': enrollment.program.name,
+                    'enrolled_on': enrollment.enrolled_on.strftime('%Y-%m-%d'),
+                    'status': enrollment.status
+                })
+
+            return JsonResponse({
+                'status': 'success',
+                'client': {
+                    'id': client.id,
+                    'name': f"{client.first_name} {client.last_name}",
+                    'national_id': client.national_id
+                },
+                'enrollments': enrollment_data
+            })
+        except Client.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Client not found'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)

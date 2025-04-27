@@ -9,5 +9,10 @@ urlpatterns = [
         login_required(DashboardView.as_view(template_name="programs-dashboard.html")),
         name="program-index",
     ),
+    path(
+        "enrollments/",
+        login_required(DashboardView.as_view(template_name="enrollments-dashboard.html")),
+        name="enrollment-index",
+    ),
 
 ]

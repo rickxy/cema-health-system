@@ -10,22 +10,22 @@
       "menu_header": "Sections"
     },
     {
-      "url": "program-index",
-      "icon": "menu-icon tf-icons ti ti-circle-letter-p",
-      "name": "Programs",
-      "slug": "program-index"
-    },
-    {
       "url": "client-index",
       "icon": "menu-icon tf-icons ti ti-circle-letter-c",
       "name": "Clients",
       "slug": "client-index"
     },
     {
-      "url": "visit-index",
-      "icon": "menu-icon tf-icons ti ti-circle-letter-v",
-      "name": "Visits",
-      "slug": "visit-index"
+      "url": "program-index",
+      "icon": "menu-icon tf-icons ti ti-circle-letter-p",
+      "name": "Programs",
+      "slug": "program-index"
+    },
+    {
+      "url": "enrollment-index",
+      "icon": "menu-icon tf-icons ti ti-circle-letter-e",
+      "name": "Enrollments",
+      "slug": "enrollment-index"
     },
     {
       "menu_header": "System"

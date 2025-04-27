@@ -69,49 +69,49 @@
 
 <!-- Offcanvas to add new client -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddClient" aria-labelledby="offcanvasAddClientLabel">
-  <div class="offcanvas-header">
+    <div class="offcanvas-header">
     <h5 id="offcanvasAddClientLabel" class="offcanvas-title">Add New Client</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100">
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100">
     <form id="addClientForm" class="pt-0">
-      {% csrf_token %}
-      <div class="mb-3">
+        {% csrf_token %}
+        <div class="mb-3">
         <label class="form-label" for="clientFirstName">First Name</label>
         <input type="text" class="form-control" id="clientFirstName" name="first_name" required />
-      </div>
-      <div class="mb-3">
+        </div>
+        <div class="mb-3">
         <label class="form-label" for="clientLastName">Last Name</label>
         <input type="text" class="form-control" id="clientLastName" name="last_name" required />
-      </div>
-      <div class="mb-3">
+        </div>
+        <div class="mb-3">
         <label class="form-label" for="clientNationalId">National ID</label>
         <input type="text" class="form-control" id="clientNationalId" name="national_id" required />
-      </div>
-      <div class="mb-3">
+        </div>
+        <div class="mb-3">
         <label class="form-label" for="clientPhoneNumber">Phone Number</label>
         <input type="text" class="form-control" id="clientPhoneNumber" name="phone_number" />
-      </div>
-      <div class="mb-3">
+        </div>
+        <div class="mb-3">
         <label class="form-label" for="clientGender">Gender</label>
         <select id="clientGender" class="select2 form-select" name="gender" required>
           <option value="">Select Gender</option>
           <option value="M">Male</option>
           <option value="F">Female</option>
           <option value="O">Other</option>
-        </select>
-      </div>
-      <div class="mb-3">
+          </select>
+        </div>
+        <div class="mb-3">
         <label class="form-label" for="clientDateOfBirth">Date of Birth</label>
         <input type="date" class="form-control" id="clientDateOfBirth" name="date_of_birth" required />
       </div>
       <div class="mb-3">
         <label class="form-label" for="clientAddress">Address</label>
         <textarea class="form-control" id="clientAddress" name="address" rows="3"></textarea>
-      </div>
+        </div>
       <button type="submit" class="btn btn-primary me-sm-3 me-1" id="submit-client-form">Submit</button>
       <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Cancel</button>
-    </form>
+      </form>
   </div>
 </div>
 
@@ -165,6 +165,58 @@
             <button type="submit" class="btn btn-primary">Save changes</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal to view client details -->
+<div class="modal fade" id="viewClientModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewClientModalTitle">Client Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <div class="d-flex align-items-center">
+              <div class="d-flex flex-column">
+                <h6 class="mb-1" id="viewClientName">Loading...</h6>
+                <span class="text-muted" id="viewClientNationalId">Loading...</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 mb-3">
+            <div class="d-flex flex-column">
+              <span class="text-muted" id="viewClientPhoneNumber">Loading...</span>
+              <span class="text-muted" id="viewClientGender">Loading...</span>
+              <span class="text-muted" id="viewClientDateOfBirth">Loading...</span>
+              <span class="text-muted" id="viewClientAddress">Loading...</span>
+            </div>
+          </div>
+          <div class="col-12">
+            <h6 class="mb-3">Program Enrollments</h6>
+            <div class="table-responsive">
+              <table class="table table-hover" id="viewClientEnrollments">
+                <thead>
+                  <tr>
+                    <th>Program</th>
+                    <th>Enrolled On</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Enrollments will be loaded here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

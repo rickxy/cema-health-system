@@ -96,6 +96,7 @@ $(function () {
             render: function (data, type, row) {
               return (
                 '<div class="d-flex align-items-center">' +
+                '<a href="javascript:;" class="text-body view-record"><i class="ti ti-eye ti-sm me-2"></i></a>' +
                 '<a href="javascript:;" class="text-body edit-record"><i class="ti ti-edit ti-sm me-2"></i></a>' +
                 '<a href="javascript:;" class="text-body delete-record"><i class="ti ti-trash ti-sm"></i></a>' +
                 '</div>'
@@ -419,6 +420,72 @@ $(function () {
           },
           error: function (xhr, status, error) {
             Swal.fire('Error!', 'An error occurred while updating the client.', 'error');
+          }
+        });
+      });
+
+      // View Record
+      $('.datatables-clients tbody').on('click', '.view-record', function () {
+        const row = $(this).closest('tr');
+        const rowData = dt_clients.row(row).data();
+        const clientId = rowData.id;
+
+        // Get client details and enrollments
+        $.ajax({
+          url: `/api/v1/client/${clientId}/enrollments/`,
+          method: 'GET',
+          success: function (response) {
+            console.log('Client details response:', response);
+            const client = response.client;
+            const enrollments = response.enrollments;
+
+            // Update client details in the modal
+            $('#viewClientName').text(client.name);
+            $('#viewClientNationalId').text(`National ID: ${client.national_id}`);
+            $('#viewClientPhoneNumber').text(`Phone: ${client.phone_number || 'N/A'}`);
+            $('#viewClientGender').text(`Gender: ${client.gender}`);
+            $('#viewClientDateOfBirth').text(`Date of Birth: ${new Date(client.date_of_birth).toLocaleDateString()}`);
+            $('#viewClientAddress').text(`Address: ${client.address || 'N/A'}`);
+
+            // Update enrollments table
+            const tbody = $('#viewClientEnrollments tbody');
+            tbody.empty();
+
+            enrollments.forEach(function (enrollment) {
+              const statusClass = {
+                active: 'badge bg-label-success',
+                completed: 'badge bg-label-info',
+                dropped: 'badge bg-label-danger'
+              };
+
+              tbody.append(`
+                <tr>
+                  <td>${enrollment.program_name}</td>
+                  <td>${enrollment.enrolled_on}</td>
+                  <td><span class="${
+                    statusClass[enrollment.status]
+                  }">${enrollment.status.charAt(0).toUpperCase() + enrollment.status.slice(1)}</span></td>
+                </tr>
+              `);
+            });
+
+            // Show the modal
+            $('#viewClientModal').modal('show');
+          },
+          error: function (xhr) {
+            console.error('Error loading client details:', xhr);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: xhr.responseJSON?.message || 'Failed to load client details',
+              customClass: {
+                container: 'swal2-container-custom'
+              },
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 3000
+            });
           }
         });
       });

@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "apps.dashboard",
     "apps.clients",
-    "apps.visits",
     "apps.users",
     "apps.programs",
     "apps.logs",
