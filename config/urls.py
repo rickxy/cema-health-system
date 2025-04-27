@@ -36,12 +36,9 @@ urlpatterns = [
     # Programs urls
     path("program/", include("apps.programs.urls")),
 
-    # Visits urls
-    path("visit/", include("apps.visits.urls")),
-
     # Users
     path("users/", include("apps.users.urls")),
-    
+
     # Logs urls
     path("logs/", include("apps.logs.urls")),
 
