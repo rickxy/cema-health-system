@@ -64,6 +64,11 @@
         <!-- /Logo -->
         <h3 class="mb-1">Welcome to CEMA! 👋</h3>
         <p class="mb-4">Please sign-in to your account and start the adventure</p>
+
+        <div class="alert alert-primary small">
+          <p class="text-caption mb-1"> Doctor Email: <strong>ricky@cema.com</strong> </p>
+          <p class="text-caption mb-0">Password: <strong>Pwd_1234</strong></p>
+        </div>
         {% if messages %}
         {% for message in messages %}
         <div
@@ -83,7 +88,6 @@
               class="form-control"
               id="email"
               name="email-username"
-              value="ricky@cema.com"
               placeholder="Email/Username"
               autofocus
             />
@@ -101,7 +105,6 @@
                 id="password"
                 class="form-control"
                 name="password"
-                value="Pwd_1234"
                 placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                 aria-describedby="password"
               />
