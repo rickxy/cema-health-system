@@ -13,12 +13,17 @@ A Django-based backend system for managing clients and health programs/services.
 - 🧹 Code formatting and editor configurations
 - 🔄 DRY and scalable folder structure
 - 🌍 Internationalization support
+- 📊 Comprehensive dashboard with analytics
+- 🔍 Detailed audit logging system
+- 📱 Responsive web interface
+- 🧪 Comprehensive test coverage
 
 ## 📋 Prerequisites
 
 - Python 3.x
 - Docker and Docker Compose
 - Node.js (for development tools)
+- PostgreSQL (for production)
 
 ## 🛠️ Installation
 
@@ -64,16 +69,31 @@ python manage.py runserver
 docker-compose up --build
 ```
 
+### Running Tests
+
+```bash
+# Run all tests
+python manage.py test
+
+# Run specific test module
+python manage.py test api.v1.tests
+
+# Run with coverage report
+coverage run manage.py test
+coverage report
+```
+
 ## 🏗️ Project Structure
 
 ```
 cema-health-system/
 ├── api/                     # DRF API views, serializers, routing
-│   ├── v1/                  # Versioned API (optional, scalable)
+│   ├── v1/                  # Versioned API
 │   │   ├── __init__.py
 │   │   ├── urls.py          # API v1 routes
 │   │   ├── views/           # DRF views for clients & programs
-│   │   └── serializers/     # DRF serializers
+│   │   ├── serializers/     # DRF serializers
+│   │   └── tests.py         # API test suite
 │
 ├── apps/                    # Django apps
 │   ├── clients/             # Client model, logic, admin
@@ -81,7 +101,7 @@ cema-health-system/
 │   │   ├── apps.py
 │   │   ├── models.py
 │   │   ├── views.py
-│   │   ├── services.py      # (optional) business logic layer
+│   │   ├── services.py      # Business logic layer
 │   │   └── tests.py
 │   │
 │   ├── programs/            # Health programs (e.g., TB, HIV)
@@ -133,14 +153,19 @@ cema-health-system/
 ├── nginx/                   # Nginx configuration files
 │   └── default.conf
 │
-├── src/                     # Optional for reusable logic, services
+├── src/                     # Frontend assets and utilities
+│   ├── assets/              # Static assets
+│   │   ├── css/             # Stylesheets
+│   │   ├── js/              # JavaScript files
+│   │   └── img/             # Images
 │   └── utils/               # Custom utilities/helpers
 │       └── validators.py
 │
-├── templates/               # HTML templates (optional, if using Django views)
-│   └── base.html
+├── templates/               # HTML templates
+│   ├── base.html
+│   └── dashboard.html
 │
-├── web_project/             # Django project root (settings, URLs)
+├── web_project/             # Django project root
 │   ├── __init__.py
 │   ├── settings.py          # Usually imports from config/
 │   ├── urls.py
@@ -159,25 +184,62 @@ cema-health-system/
 
 Use the .env file for local configuration, and .env.prod for production settings. Key variables include:
 
-- `.env` - Development environment variables
-- `.env.prod` - Production environment variables
+- `DEBUG`: Set to True for development, False for production
+- `SECRET_KEY`: Django secret key
+- `DATABASE_URL`: Database connection string
+- `ALLOWED_HOSTS`: List of allowed hostnames
+- `EMAIL_BACKEND`: Email configuration
+- `JWT_SECRET_KEY`: JWT signing key
+
+## 🧪 Testing
+
+The project includes comprehensive test coverage for:
+
+```bash
+# Run all tests
+python manage.py test
+
+# Run specific test module
+python manage.py test api.v1.tests
+
+# Run with coverage report
+coverage run manage.py test
+coverage report
+```
+
+## 📊 Dashboard Features
+
+- Real-time client statistics
+- Program enrollment tracking
+- Gender distribution analysis
+- Program success rates
+- Recent enrollments overview
+- Completion and dropout rates
+- Active programs monitoring
 
 ## 🛡️ Security
 
 - Environment variables for sensitive data
-- Django security best practices enforced (e.g., SECURE_SSL_REDIRECT, CSRF_COOKIE_SECURE)
-- Data access via authenticated APIs (JWT)
-- Django security settings
-- Production-ready configurations
+- Django security best practices enforced
+- JWT-based authentication
+- CSRF protection
+- Rate limiting
+- Input validation
+- Audit logging
+- Production-ready security configurations
 
 ## 📦 Dependencies
 
 Main dependencies include:
 
 - Django 4.2.5
+- Django REST Framework
 - Gunicorn 21.2.0
 - Python-dotenv 1.0.0
 - Whitenoise 6.5.0
+- PostgreSQL
+- Redis (for caching)
+- Celery (for background tasks)
 
 ## 📝 License
 
@@ -188,3 +250,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Django community
 - Open source contributors
 - CEMA mentorship program
+- All contributors and maintainers
